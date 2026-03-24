@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NOIR — Fashion</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a08;
+    --white: #f5f2ec;
+    --cream: #e8e2d6;
+    --gold: #c9a96e;
+    --grey: #3a3a36;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  #cursor {
+    width: 10px; height: 10px;
+    background: var(--white);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: transform 0.15s ease;
+  }
+  #cursor-follower {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(245,242,236,0.4);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: width 0.3s, height 0.3s, border-color 0.3s;
+  }
+  body:has(a:hover) #cursor-follower,
+  body:has(button:hover) #cursor-follower {
+    width: 60px; height: 60px;
+    border-color: var(--gold);
+  }
+
+  /* ── PRELOADER ── */
+  #preloader {
+    position: fixed; inset: 0;
+    background: var(--black);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  #preloader-logo {
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 300;
+    letter-spacing: 0.4em;
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  #preloader-bar-wrap {
+    width: min(400px, 60vw);
+    height: 1px;
+    background: var(--grey);
+    position: relative;
+    overflow: hidden;
+  }
+  #preloader-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--gold);
+    transition: width 0.05s linear;
+  }
+  #preloader-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 4vw;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-size: 1.3rem;
+    letter-spacing: 0.5em;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex; gap: 3rem; list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 0%; height: 1px;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── HERO ── */
+  #hero {
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 6vw;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0a0a08 0%, #1a1a14 50%, #0d0d0a 100%);
+  }
+  .hero-bg-img {
+    position: absolute; inset: 0;
+    background-image: 
+      radial-gradient(ellipse at 70% 50%, rgba(201,169,110,0.08) 0%, transparent 60%),
+      url("https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+    transform: scale(1.05);
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .hero-eyebrow span { display: block; }
+  .hero-title {
+    font-size: clamp(4rem, 13vw, 14rem);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    overflow: hidden;
+  }
+  .hero-title .line { overflow: hidden; display: block; }
+  .hero-title .line span { display: block; }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    margin-top: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+  .hero-desc {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: rgba(245,242,236,0.6);
+    max-width: 300px;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 2.5rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: background 0.3s, color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    z-index: -1;
+  }
+  .hero-cta:hover::before { transform: scaleX(1); }
+  .hero-cta:hover { color: var(--black); }
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 3rem; right: 4vw;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.3);
+    writing-mode: vertical-rl;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-scroll-hint::before {
+    content: '';
+    width: 1px; height: 60px;
+    background: var(--gold);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { height: 0; opacity: 1; }
+    100% { height: 60px; opacity: 0; }
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    border-top: 1px solid var(--grey);
+    border-bottom: 1px solid var(--grey);
+    overflow: hidden;
+    padding: 1.2rem 0;
+    background: var(--black);
+  }
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 20s linear infinite;
+  }
+  .marquee-track span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--grey);
+    padding: 0 3rem;
+  }
+  .marquee-track span.accent { color: var(--gold); }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── COLLECTION ── */
+  #collection {
+    padding: 8vw 4vw;
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 5rem;
+  }
+  .section-title {
+    font-size: clamp(2.5rem, 6vw, 6rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.4);
+    margin-bottom: 0.5rem;
+  }
+  .view-all {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 2px;
+    align-self: flex-end;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2rem;
+  }
+  .product-card {
+    position: relative;
+    cursor: none;
+  }
+  .product-card:nth-child(1) { grid-column: span 5; grid-row: span 2; }
+  .product-card:nth-child(2) { grid-column: span 4; margin-top: 4rem; }
+  .product-card:nth-child(3) { grid-column: span 3; }
+  .product-card:nth-child(4) { grid-column: span 4; }
+  .product-card:nth-child(5) { grid-column: span 3; margin-top: -2rem; }
+
+  .product-img-wrap {
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 3/4;
+    background: var(--grey);
+  }
+  .product-card:nth-child(1) .product-img-wrap { aspect-ratio: 2/3; }
+  .product-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: grayscale(20%);
+  }
+  .product-card:hover .product-img-wrap img {
+    transform: scale(1.08);
+    filter: grayscale(0%);
+  }
+  .product-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,10,8,0.7) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: flex; align-items: flex-end; padding: 1.5rem;
+  }
+  .product-card:hover .product-overlay { opacity: 1; }
+  .product-quick-add {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: none;
+    border: 1px solid rgba(245,242,236,0.5);
+    padding: 0.7rem 1.2rem;
+    cursor: none;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .product-quick-add:hover { background: var(--white); color: var(--black); }
+  .product-info { margin-top: 1.2rem; }
+  .product-name {
+    font-size: clamp(1rem, 1.5vw, 1.4rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+  }
+  .product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+  .product-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+  .product-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(245,242,236,0.3);
+  }
+
+  /* ── EDITORIAL ── */
+  #editorial {
+    padding: 8vw 4vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6vw;
+    align-items: center;
+    border-top: 1px solid var(--grey);
+  }
+  .editorial-visual {
+    position: relative;
+    overflow: hidden;
+  }
+  .editorial-visual img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(15%);
+    transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  #editorial:hover .editorial-visual img { transform: scale(1.04); }
+  .editorial-tag {
+    position: absolute;
+    top: 2rem; left: 2rem;
+    background: var(--gold);
+    color: var(--black);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+  }
+  .editorial-text {}
+  .editorial-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 2rem;
+  }
+  .editorial-title {
+    font-size: clamp(2.5rem, 5vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
+  .editorial-title em { font-style: italic; color: var(--gold); }
+  .editorial-body {
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.9;
+    color: rgba(245,242,236,0.55);
+    max-width: 420px;
+    margin-bottom: 3rem;
+  }
+  .editorial-link {
+    display: inline-flex; align-items: center; gap: 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .editorial-link::after {
+    content: '→';
+    transition: transform 0.3s ease;
+  }
+  .editorial-link:hover::after { transform: translateX(6px); }
+
+  /* ── HORIZONTAL SCROLL ── */
+  #lookbook {
+    padding: 8vw 0;
+    border-top: 1px solid var(--grey);
+    overflow: hidden;
+  }
+  .lookbook-header {
+    padding: 0 4vw;
+    margin-bottom: 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .lookbook-scroll {
+    display: flex;
+    gap: 2rem;
+    padding: 0 4vw;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  .lookbook-scroll::-webkit-scrollbar { display: none; }
+  .lookbook-item {
+    flex: 0 0 auto;
+    width: clamp(250px, 25vw, 380px);
+  }
+  .lookbook-item img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(20%);
+    transition: filter 0.4s, transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .lookbook-item:hover img { filter: grayscale(0%); transform: scale(1.02); }
+  .lookbook-item-info { margin-top: 1rem; }
+  .lookbook-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+  .lookbook-name { font-size: 1.1rem; font-weight: 300; letter-spacing: 0.05em; }
+  .lookbook-scroll-nav {
+    display: flex; gap: 1rem;
+    padding: 2rem 4vw 0;
+  }
+  .scroll-btn {
+    width: 50px; height: 50px;
+    border: 1px solid var(--grey);
+    background: none;
+    color: var(--white);
+    cursor: none;
+    font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.3s, background 0.3s, color 0.3s;
+  }
+  .scroll-btn:hover { border-color: var(--gold); background: var(--gold); color: var(--black); }
+
+  /* ── NEWSLETTER ── */
+  #newsletter {
+    padding: 8vw 4vw;
+    border-top: 1px solid var(--grey);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4vw;
+    align-items: center;
+  }
+  .newsletter-title {
+    font-size: clamp(2rem, 4.5vw, 5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .newsletter-title em { font-style: italic; color: var(--gold); }
+  .newsletter-form { display: flex; flex-direction: column; gap: 1.5rem; }
+  .newsletter-desc {
+    font-size: 1rem;
+    color: rgba(245,242,236,0.5);
+    line-height: 1.7;
+  }
+  .input-wrap {
+    display: flex;
+    border-bottom: 1px solid var(--grey);
+    transition: border-color 0.3s;
+  }
+  .input-wrap:focus-within { border-color: var(--gold); }
+  .input-wrap input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    padding: 1rem 0;
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+  }
+  .input-wrap input::placeholder { color: rgba(245,242,236,0.3); }
+  .submit-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: none;
+    padding: 0 0 0 1rem;
+    transition: color 0.3s;
+  }
+  .submit-btn:hover { color: var(--white); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 4vw;
+    border-top: 1px solid var(--grey);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 3rem;
+  }
+  .footer-brand {}
+  .footer-logo {
+    font-size: 2rem;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+  .footer-tagline {
+    font-size: 0.9rem;
+    color: rgba(245,242,236,0.4);
+    line-height: 1.7;
+    max-width: 200px;
+  }
+  .footer-col h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+  .footer-col ul a {
+    font-size: 0.9rem;
+    color: rgba(245,242,236,0.5);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-col ul a:hover { color: var(--white); }
+  .footer-bottom {
+    padding: 2rem 4vw;
+    border-top: 1px solid var(--grey);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,242,236,0.25);
+  }
+
+  /* ── REVEAL ANIMATIONS ── */
+  .reveal { overflow: hidden; }
+  .reveal-inner { display: block; }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.4;
+  }
+
+  @media (max-width: 768px) {
+    .products-grid { grid-template-columns: 1fr 1fr; }
+    .product-card:nth-child(n) { grid-column: span 1; grid-row: span 1; margin: 0; }
+    #editorial { grid-template-columns: 1fr; }
+    #newsletter { grid-template-columns: 1fr; }
+    footer { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .hero-sub { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-follower"></div>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div id="preloader-logo">Noir</div>
+  <div id="preloader-bar-wrap">
+    <div id="preloader-bar"></div>
+  </div>
+  <div id="preloader-count">000</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">noir</a>
+  <ul class="nav-links">
+    <li><a href="#">Collection</a></li>
+    <li><a href="#">Lookbook</a></li>
+    <li><a href="#">Editorial</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Cart (0)</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-bg-img"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span>SS 2025 Collection</span></div>
+    <h1 class="hero-title">
+      <span class="line"><span>Dressed in</span></span>
+      <span class="line"><span><em>Silence</em></span></span>
+    </h1>
+    <div class="hero-sub">
+      <p class="hero-desc">Where minimalism meets artistry. Each piece a quiet statement in a world of noise.</p>
+      <a href="#collection" class="hero-cta">Explore Collection</a>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">Scroll</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>New Arrivals</span><span class="accent">✦</span>
+    <span>SS 2025</span><span class="accent">✦</span>
+    <span>Crafted in Italy</span><span class="accent">✦</span>
+    <span>Free Shipping Over $200</span><span class="accent">✦</span>
+    <span>New Arrivals</span><span class="accent">✦</span>
+    <span>SS 2025</span><span class="accent">✦</span>
+    <span>Crafted in Italy</span><span class="accent">✦</span>
+    <span>Free Shipping Over $200</span><span class="accent">✦</span>
+    <span>New Arrivals</span><span class="accent">✦</span>
+    <span>SS 2025</span><span class="accent">✦</span>
+    <span>Crafted in Italy</span><span class="accent">✦</span>
+    <span>Free Shipping Over $200</span><span class="accent">✦</span>
+  </div>
+</div>
+
+<!-- COLLECTION -->
+<section id="collection">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Featured</div>
+      <h2 class="section-title">The <em>Edit</em></h2>
+    </div>
+    <a href="#" class="view-all">View All</a>
+  </div>
+
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=80" alt="Silk Slip Dress" loading="lazy"/>
+        <div class="product-overlay">
+          <button class="product-quick-add">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Obsidian Silk Slip Dress</div>
+        <div class="product-meta">
+          <span class="product-price">$485</span>
+          <span class="product-tag">New</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1594938298603-c8148c4b4f20?w=800&q=80" alt="Linen Coat" loading="lazy"/>
+        <div class="product-overlay">
+          <button class="product-quick-add">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Raw Linen Overcoat</div>
+        <div class="product-meta">
+          <span class="product-price">$720</span>
+          <span class="product-tag">Limited</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=80" alt="Trousers" loading="lazy"/>
+        <div class="product-overlay">
+          <button class="product-quick-add">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Wide Leg Wool Trousers</div>
+        <div class="product-meta">
+          <span class="product-price">$310</span>
+          <span class="product-tag">Bestseller</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=800&q=80" alt="Blouse" loading="lazy"/>
+        <div class="product-overlay">
+          <button class="product-quick-add">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Draped Silk Blouse</div>
+        <div class="product-meta">
+          <span class="product-price">$265</span>
+          <span class="product-tag">New</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80" alt="Jacket" loading="lazy"/>
+        <div class="product-overlay">
+          <button class="product-quick-add">Quick Add</button>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">Structured Blazer</div>
+        <div class="product-meta">
+          <span class="product-price">$580</span>
+          <span class="product-tag">Limited</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDITORIAL -->
+<section id="editorial">
+  <div class="editorial-visual">
+    <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80" alt="Editorial" loading="lazy"/>
+    <div class="editorial-tag">Editorial</div>
+  </div>
+  <div class="editorial-text">
+    <div class="editorial-num">01 / 03</div>
+    <h2 class="editorial-title">The Art of<br/><em>Wearing Nothing</em></h2>
+    <p class="editorial-body">
+      Our spring collection explores the tension between absence and presence. 
+      Garments that speak through restraint — each cut deliberate, each fabric chosen for its relationship with light and body.
+    </p>
+    <a href="#" class="editorial-link">Read the Story</a>
+  </div>
+</section>
+
+<!-- LOOKBOOK -->
+<section id="lookbook">
+  <div class="lookbook-header">
+    <div>
+      <div class="section-label">Lookbook</div>
+      <h2 class="section-title">SS <em>2025</em></h2>
+    </div>
+    <div class="lookbook-scroll-nav">
+      <button class="scroll-btn" id="scrollLeft">←</button>
+      <button class="scroll-btn" id="scrollRight">→</button>
+    </div>
+  </div>
+
+  <div class="lookbook-scroll" id="lookbookScroll">
+    <div class="lookbook-item">
+      <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" alt="Look 01" loading="lazy"/>
+      <div class="lookbook-item-info">
+        <div class="lookbook-num">Look 01</div>
+        <div class="lookbook-name">The Ivory Study</div>
+      </div>
+    </div>
+    <div class="lookbook-item">
+      <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80" alt="Look 02" loading="lazy"/>
+      <div class="lookbook-item-info">
+        <div class="lookbook-num">Look 02</div>
+        <div class="lookbook-name">Midnight Layers</div>
+      </div>
+    </div>
+    <div class="lookbook-item">
+      <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&q=80" alt="Look 03" loading="lazy"/>
+      <div class="lookbook-item-info">
+        <div class="lookbook-num">Look 03</div>
+        <div class="lookbook-name">Desert Archive</div>
+      </div>
+    </div>
+    <div class="lookbook-item">
+      <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80" alt="Look 04" loading="lazy"/>
+      <div class="lookbook-item-info">
+        <div class="lookbook-num">Look 04</div>
+        <div class="lookbook-name">The Draped Form</div>
+      </div>
+    </div>
+    <div class="lookbook-item">
+      <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80" alt="Look 05" loading="lazy"/>
+      <div class="lookbook-item-info">
+        <div class="lookbook-num">Look 05</div>
+        <div class="lookbook-name">Urban Silence</div>
+      </div>
+    </div>
+    <div class="lookbook-item">
+      <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" alt="Look 06" loading="lazy"/>
+      <div class="lookbook-item-info">
+        <div class="lookbook-num">Look 06</div>
+        <div class="lookbook-name">Soft Architecture</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section id="newsletter">
+  <div>
+    <h2 class="newsletter-title">Stay in<br/><em>the Edit</em></h2>
+  </div>
+  <div class="newsletter-form">
+    <p class="newsletter-desc">
+      Early access to new collections, editorial content, and exclusive events. Join the quiet circle.
+    </p>
+    <div class="input-wrap">
+      <input type="email" placeholder="Your email address" />
+      <button class="submit-btn">Subscribe →</button>
+    </div>
+    <p style="font-size:0.75rem; color: rgba(245,242,236,0.25); font-family: 'Space Mono', monospace; letter-spacing: 0.1em;">
+      No noise. Unsubscribe anytime.
+    </p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="footer-logo">noir</span>
+    <p class="footer-tagline">Minimal fashion for a world that moves too fast.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Shop</h4>
+    <ul>
+      <li><a href="#">New Arrivals</a></li>
+      <li><a href="#">Collection</a></li>
+      <li><a href="#">Lookbook</a></li>
+      <li><a href="#">Sale</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Info</h4>
+    <ul>
+      <li><a href="#">About Noir</a></li>
+      <li><a href="#">Sustainability</a></li>
+      <li><a href="#">Craftsmanship</a></li>
+      <li><a href="#">Careers</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Help</h4>
+    <ul>
+      <li><a href="#">Shipping & Returns</a></li>
+      <li><a href="#">Size Guide</a></li>
+      <li><a href="#">Contact</a></li>
+      <li><a href="#">FAQ</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span class="footer-copy">© 2025 Noir. All rights reserved.</span>
+  <span class="footer-copy">Made with intention.</span>
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── PRELOADER ── */
+(function() {
+  const bar = document.getElementById('preloader-bar');
+  const count = document.getElementById('preloader-count');
+  const preloader = document.getElementById('preloader');
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 4 + 1;
+    if (progress >= 100) progress = 100;
+    bar.style.width = progress + '%';
+    count.textContent = String(Math.floor(progress)).padStart(3, '0');
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(() => {
+        gsap.to(preloader, {
+          yPercent: -100,
+          duration: 1.2,
+          ease: 'power4.inOut',
+          onComplete: () => { preloader.style.display = 'none'; runEntrance(); }
+        });
+      }, 300);
+    }
+  }, 30);
+})();
+
+/* ── ENTRANCE ANIMATIONS ── */
+function runEntrance() {
+  const tl = gsap.timeline();
+  tl.from('.hero-eyebrow span', { y: '100%', duration: 0.8, ease: 'power4.out' })
+    .from('.hero-title .line span', { y: '110%', duration: 1, ease: 'power4.out', stagger: 0.1 }, '-=0.4')
+    .from('.hero-desc', { y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4')
+    .from('.hero-cta', { y: 20, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
+    .from('.hero-scroll-hint', { opacity: 0, duration: 0.6 }, '-=0.3')
+    .from('nav', { y: -20, opacity: 0, duration: 0.6, ease: 'power3.out' }, 0.2);
+}
+
+/* ── CUSTOM CURSOR ── */
+const cursor = document.getElementById('cursor');
+const follower = document.getElementById('cursor-follower');
+let mouseX = 0, mouseY = 0, followerX = 0, followerY = 0;
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  gsap.to(cursor, { x: mouseX, y: mouseY, duration: 0 });
+});
+
+(function animateFollower() {
+  followerX += (mouseX - followerX) * 0.1;
+  followerY += (mouseY - followerY) * 0.1;
+  follower.style.left = followerX + 'px';
+  follower.style.top = followerY + 'px';
+  requestAnimationFrame(animateFollower);
+})();
+
+/* ── SCROLL ANIMATIONS ── */
+// Section titles
+gsap.utils.toArray('.section-title, .editorial-title, .newsletter-title').forEach(el => {
+  gsap.from(el, {
+    y: 60, opacity: 0, duration: 1, ease: 'power4.out',
+    scrollTrigger: { trigger: el, start: 'top 85%' }
+  });
+});
+
+// Section labels
+gsap.utils.toArray('.section-label, .editorial-num, .lookbook-num').forEach(el => {
+  gsap.from(el, {
+    x: -20, opacity: 0, duration: 0.6, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 90%' }
+  });
+});
+
+// Product cards
+gsap.utils.toArray('.product-card').forEach((card, i) => {
+  gsap.from(card, {
+    y: 80, opacity: 0, duration: 0.9, ease: 'power3.out',
+    delay: i * 0.08,
+    scrollTrigger: { trigger: '#collection', start: 'top 70%' }
+  });
+});
+
+// Editorial
+gsap.from('.editorial-visual', {
+  x: -60, opacity: 0, duration: 1.2, ease: 'power4.out',
+  scrollTrigger: { trigger: '#editorial', start: 'top 75%' }
+});
+gsap.from('.editorial-text > *', {
+  y: 40, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.12,
+  scrollTrigger: { trigger: '#editorial', start: 'top 70%' }
+});
+
+// Newsletter
+gsap.from('#newsletter > *', {
+  y: 50, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.15,
+  scrollTrigger: { trigger: '#newsletter', start: 'top 80%' }
+});
+
+// Marquee
+gsap.from('.marquee-wrap', {
+  opacity: 0, duration: 0.6,
+  scrollTrigger: { trigger: '.marquee-wrap', start: 'top 95%' }
+});
+
+// Hero bg parallax
+gsap.to('.hero-bg-img', {
+  yPercent: 20,
+  ease: 'none',
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+
+/* ── MAGNETIC BUTTONS ── */
+document.querySelectorAll('.hero-cta, .scroll-btn, .submit-btn').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    gsap.to(btn, { x: x * 0.25, y: y * 0.25, duration: 0.4, ease: 'power2.out' });
+  });
+  btn.addEventListener('mouseleave', () => {
+    gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.4)' });
+  });
+});
+
+/* ── LOOKBOOK SCROLL ── */
+const lookbookScroll = document.getElementById('lookbookScroll');
+document.getElementById('scrollLeft').addEventListener('click', () => {
+  lookbookScroll.scrollBy({ left: -400, behavior: 'smooth' });
+});
+document.getElementById('scrollRight').addEventListener('click', () => {
+  lookbookScroll.scrollBy({ left: 400, behavior: 'smooth' });
+});
+
+/* ── FOOTER STAGGER ── */
+gsap.from('footer > *', {
+  y: 30, opacity: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out',
+  scrollTrigger: { trigger: 'footer', start: 'top 85%' }
+});
+</script>
+</body>
+</html>

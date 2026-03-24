@@ -1,0 +1,11 @@
+# Server
+PORT=5000
+
+# MySQL Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=harsh
+DB_NAME=noir_fashion
+
+# JWT Secret (any random string)
+JWT_SECRET=noirsecretkey123456

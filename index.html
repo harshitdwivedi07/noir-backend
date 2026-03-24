@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+<input type="text" id="name">
+<button id="show">Show Name</button>
+
+<script>
+$(document).ready(function(){
+    $("#show").click(function(){
+        let name = $("#name").val();
+        alert("Name: " + name);
+    });
+});
+</script>
+
+</body>
+</html>
