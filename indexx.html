@@ -1359,8 +1359,7 @@ gsap.from('footer > *', {
 //         API SETUP
 // ════════════════════════════════
 
-const API = 'http://localhost:5000/api';
-
+const API = 'https://noir-backend-production.up.railway.app/api';
 // Get token from localStorage (stays after page refresh)
 let token = localStorage.getItem('noir_token');
 let currentUser = JSON.parse(localStorage.getItem('noir_user') || 'null');
