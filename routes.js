@@ -112,14 +112,12 @@ router.post('/login', async (req, res) => {
 
 // GET MY PROFILE
 // GET /api/me  (requires login)
-router.get('/me', protect, async (req, res) => {
+router.get('/products', async (req, res) => {
   try {
-    const [rows] = await db.query(
-      'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
-      [req.user.id]
-    );
-    res.json(rows[0]);
+    const [rows] = await db.query("SELECT * FROM products");
+    res.json(rows);
   } catch (err) {
+    console.error("DB ERROR:", err);   // 🔥 IMPORTANT
     res.status(500).json({ message: err.message });
   }
 });
