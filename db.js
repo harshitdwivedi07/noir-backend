@@ -5,20 +5,14 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT
+  port: process.env.DB_PORT,
 });
 
-// ✅ FIX: export pool.promise() directly
-module.exports = pool.promise();
+const db = pool.promise();  // ✅ THIS LINE IS CRITICAL
 
-// 🔥 Add this to test connection
-pool.getConnection((err, conn) => {
-  if (err) {
-    console.error("❌ DB ERROR:", err);
-  } else {
-    console.log("✅ MySQL Connected");
-    conn.release();
-  }
-});
+// Test connection
+db.getConnection()
+  .then(() => console.log("✅ MySQL Connected"))
+  .catch(err => console.error("❌ DB ERROR:", err));
 
 module.exports = db;
