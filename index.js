@@ -11,12 +11,9 @@ const app  = express();
 const PORT = process.env.PORT || 5000;
 
 // ── MIDDLEWARE ──
-app.use(cors({
-  origin: [
-    'https://preeminent-cascaron-77b356.netlify.app',
-    'https://inspiring-blini-72c05c.netlify.app'
-  ]
-}));       // allows frontend to talk to backend
+const cors = require('cors');
+
+app.use(cors());       // allows frontend to talk to backend
 app.use(express.json());   // lets us read JSON from request body
 
 // ── ROUTES ──
