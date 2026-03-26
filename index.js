@@ -7,7 +7,11 @@ const app  = express();
 const PORT = process.env.PORT || 5000;
 
 // ── MIDDLEWARE ──
-app.use(cors());
+app.use(cors({
+  origin: "https://preeminent-cascaron-77b356.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // ── ROUTES ──
