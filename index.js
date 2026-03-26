@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: "https://preeminent-cascaron-77b356.netlify.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 app.use(express.json());
