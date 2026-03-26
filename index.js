@@ -1,7 +1,3 @@
-// index.js
-// This is the starting point of the backend
-// Run it with: node index.js  or  npm run dev
-
 require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
@@ -11,13 +7,10 @@ const app  = express();
 const PORT = process.env.PORT || 5000;
 
 // ── MIDDLEWARE ──
-const cors = require('cors');
-
-app.use(cors());       // allows frontend to talk to backend
-app.use(express.json());   // lets us read JSON from request body
+app.use(cors());
+app.use(express.json());
 
 // ── ROUTES ──
-// All routes start with /api
 app.use('/api', routes);
 
 // ── HOME ROUTE ──
@@ -42,6 +35,5 @@ app.get('/', (req, res) => {
 
 // ── START SERVER ──
 app.listen(PORT, () => {
-  console.log(`\n🖤 NOIR Backend running on http://localhost:${PORT}`);
-  console.log(`📦 Visit http://localhost:${PORT} to see all routes\n`);
+  console.log(`🖤 NOIR Backend running on http://localhost:${PORT}`);
 });
